@@ -1,10 +1,28 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text.RegularExpressions;
+
 namespace DesafioFundamentos.Models
 {
+
+    public class Carro
+    {
+        public string Placa {get; set; }
+        public DateTime HoraEntrada {get; set; }
+
+
+        public Carro(string placa)
+        {
+            Placa = placa;
+            HoraEntrada = DateTime.Now;
+        }
+    }
     public class Estacionamento
     {
         private decimal precoInicial = 0;
         private decimal precoPorHora = 0;
-        private List<string> veiculos = new List<string>();
+        private List<Carro> veiculos = new List<Carro>();
 
         public Estacionamento(decimal precoInicial, decimal precoPorHora)
         {
@@ -20,8 +38,25 @@ namespace DesafioFundamentos.Models
 
             string placa = Console.ReadLine();
 
-            veiculos.Add(placa.ToUpper());
-            Console.WriteLine($"Veículo com a placa {placa} adicionado com sucesso!");
+            // Validação da placa usando Regex
+            if (Regex.IsMatch(placa, @"^[A-Z]{3}\d{4}$"))
+            {
+                // Verifica se o veículo já está cadastrado
+                if (veiculos.Any(x => x.Placa.ToUpper() == placa.ToUpper()))
+                {
+                    Console.WriteLine("Esse veículo já está cadastrado no estacionamento.");
+                }
+                else
+                {
+                    veiculos.Add(new Carro(placa.ToUpper()));
+                    Console.WriteLine($"Veículo com a placa {placa} adicionado com sucesso!");
+                }
+            }
+            else
+            {
+                Console.WriteLine("Placa inválida. Certifique-se de que a placa está no formato correto (AAA1234).");
+            }
+                   
         }
 
         public void RemoverVeiculo()
@@ -33,22 +68,19 @@ namespace DesafioFundamentos.Models
             string placa = Console.ReadLine();
 
             // Verifica se o veículo existe
-            if (veiculos.Any(x => x.ToUpper() == placa.ToUpper()))
+
+             if (veiculos.Any(x => x.Placa.ToUpper() == placa.ToUpper()))
             {
                 Console.WriteLine("Digite a quantidade de horas que o veículo permaneceu estacionado:");
-
-                // TODO: Pedir para o usuário digitar a quantidade de horas que o veículo permaneceu estacionado,
-                // TODO: Realizar o seguinte cálculo: "precoInicial + precoPorHora * horas" para a variável valorTotal                
-                // *IMPLEMENTE AQUI* ---------------------------------------------------------------------------------------DONE!!!
                 int horas = int.Parse(Console.ReadLine());
-                decimal valorTotal = precoInicial+(precoPorHora*horas); 
 
-                // TODO: Remover a placa digitada da lista de veículos
-                // *IMPLEMENTE AQUI* ---------------------------------------------------------------------------------------DONE!!!
+                Carro carro = veiculos.First(x => x.Placa.ToUpper() == placa.ToUpper());
+                veiculos.Remove(carro);
 
-                veiculos.Remove(placa.ToUpper());
+                decimal valorTotal = precoInicial + (precoPorHora * horas);
                 Console.WriteLine($"O veículo {placa} foi removido e o preço total foi de: R$ {valorTotal}");
             }
+
             else
             {
                 Console.WriteLine("Desculpe, esse veículo não está estacionado aqui. Confira se digitou a placa corretamente");
@@ -63,8 +95,9 @@ namespace DesafioFundamentos.Models
                 Console.WriteLine("Os veículos estacionados são:");
                 // TODO: Realizar um laço de repetição, exibindo os veículos estacionados
                 // *IMPLEMENTE AQUI* ---------------------------------------------------------------------------------------DONE!!!
-                foreach(string veiculo in veiculos){
-                    Console.WriteLine(veiculo);
+                foreach(Carro carro in veiculos)
+                {
+                    Console.WriteLine($"Placa: {carro.Placa}, Hora de entrada: {carro.HoraEntrada}");
                 }
             }
             else
